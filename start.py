@@ -48,11 +48,52 @@ Remove comlumns with only 1 answer
 # print 'written filtered dataframe to file'
 
 """
+Remove duplicate comlumns
+"""
+dataset = pd.DataFrame.from_csv("train_col_filt.csv")
+print dataset.head()
+
+col_n = dataset.shape[1]
+interval = 500
+
+col_names = dataset.columns.values.tolist()
+col_types = dataset.dtypes
+
+dataset_splited = []
+for i in range(0, col_n, interval):
+    if col_n > i + interval:
+        dataset_temp = dataset[col_names[i: (i + interval)]]
+        print i, ' before: ', dataset_temp.shape
+
+        dataset_temp = dataset_temp.T.drop_duplicates().T
+        print i, ' after: ', dataset_temp.shape
+        dataset_splited.append(dataset_temp)
+    else:
+        dataset_temp = dataset[col_names[i:]]
+        print i, ' before: ', dataset_temp.shape
+
+        dataset_temp = dataset_temp.T.drop_duplicates().T
+        print i, ' after: ', dataset_temp.shape
+        dataset_splited.append(dataset_temp)
+dataset = pd.concat(dataset_splited, axis=1)
+
+del dataset_splited, dataset_temp
+print dataset.head()
+
+col_names = dataset.columns.values.tolist()
+
+dataset = pd.DataFrame.from_csv("train_col_filt_2.csv")
+
+dataset_test = pd.DataFrame.from_csv("test_col_filt.csv")
+dataset_test = dataset_test[col_names[:-1]]
+dataset_test.to_csv("test_col_filt_2.csv")
+
+"""
 change categorical variables to dummy variables, meanwhile ignoring variables with more than 20 values
 """
 # get file with only relevant rows
-dataset = pd.DataFrame.from_csv("train_col_filt.csv")
-dataset_test = pd.DataFrame.from_csv("test_col_filt.csv")
+dataset = pd.DataFrame.from_csv("train_col_filt_2.csv")
+dataset_test = pd.DataFrame.from_csv("test_col_filt_2.csv")
 
 good_columns = list(dataset.columns.values)
 

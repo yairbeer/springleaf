@@ -49,66 +49,107 @@ Remove comlumns with only 1 answer
 # print 'written filtered dataframe to file'
 
 """
+Remove duplicate comlumns
+"""
+dataset = pd.DataFrame.from_csv("train_col_filt.csv")
+print dataset.head()
+
+col_n = dataset.shape[1]
+interval = 500
+
+col_names = dataset.columns.values.tolist()
+col_types = dataset.dtypes
+
+dataset_splited = []
+for i in range(0, col_n, interval):
+    if col_n > i + interval:
+        dataset_temp = dataset[col_names[i: (i + interval)]]
+        print i, ' before: ', dataset_temp.shape
+
+        dataset_temp = dataset_temp.T.drop_duplicates().T
+        print i, ' after: ', dataset_temp.shape
+        dataset_splited.append(dataset_temp)
+    else:
+        dataset_temp = dataset[col_names[i:]]
+        print i, ' before: ', dataset_temp.shape
+
+        dataset_temp = dataset_temp.T.drop_duplicates().T
+        print i, ' after: ', dataset_temp.shape
+        dataset_splited.append(dataset_temp)
+dataset = pd.concat(dataset_splited, axis=1)
+
+del dataset_splited, dataset_temp
+print dataset.head()
+
+col_names = dataset.columns.values.tolist()
+
+dataset = pd.DataFrame.to_csv("train_col_filt_2.csv")
+
+dataset_test = pd.DataFrame.from_csv("test_col_filt.csv")
+dataset_test = dataset_test[col_names[:-1]]
+dataset_test.to_csv("test_col_filt_2.csv")
+
+"""
 change categorical variables to dummy variables, meanwhile ignoring variables with more than 20 values
 """
-# # get file with only relevant rows
-# print 'reading train dataset'
-# dataset = pd.DataFrame.from_csv("train_col_filt.csv")
-#
-# print 'reading test dataset'
-# dataset_test = pd.DataFrame.from_csv("test_col_filt.csv")
-#
-# good_columns = list(dataset.columns.values)
-#
-# # check column data type
-# data_types = dataset.dtypes
-# dummies = []
-# dummies_test = []
-# print 'starting to convert to dummy variables'
-# for i in range(len(good_columns) - 1):
-#     # use getdummies in order to convert categorial to workable numerical table
-#     col_dif_values = dataset[good_columns[i]].value_counts().shape[0]
-#     # maximum number of columns viable to create dummies
-#     print good_columns[i], ' has ', col_dif_values, ' columns'
-#     if data_types[i] == 'object':
-#         if col_dif_values <= 100:
-#             print 'working'
-#             new_dummy = pd.get_dummies(dataset[good_columns[i]]).astype('float64')
-#             new_dummy_test = pd.get_dummies(dataset_test[good_columns[i]]).astype('float64')
-#             columns_dummy = new_dummy.columns.values.tolist()
-#             for j in range(len(columns_dummy)):
-#                 columns_dummy[j] = good_columns[i] + '_' + str(columns_dummy[j])
-#             new_dummy.columns = columns_dummy
-#             # remove categorical column
-#             dummies.append(new_dummy)
-#             dummies_test.append(new_dummy_test)
-#             # add dummy columns
-#         else:
-#             print dataset[good_columns[i]].value_counts().shape[0]
-#             print dataset[good_columns[i]].value_counts().index[:5]
-#         dataset = dataset.drop(good_columns[i], 1)
-#         dataset_test = dataset_test.drop(good_columns[i], 1)
-# dataset = pd.concat(dummies + [dataset], axis=1)
-# dataset_test = pd.concat(dummies_test + [dataset_test], axis=1)
-#
-# columns_dummy = dataset.columns.values.tolist()
-# columns_dummy_test = dataset_test.columns.values.tolist()
-#
-# columns_dummy_and = []
-# for col in columns_dummy:
-#     if col in columns_dummy_test:
-#         columns_dummy_and.append(col)
-# dataset = dataset[columns_dummy_and + ['target']]
-# dataset_test = dataset_test[columns_dummy_and]
-#
-# print 'added new ', len(columns_dummy), ' columns'
-#
-# print 'finished converting dummies'
-#
-# dataset.to_csv("train_col_dummy.csv")
-# dataset_test.to_csv("test_col_dummy.csv")
-#
-# print 'written dataframe with str to dummy to file'
+# get file with only relevant rows
+print 'reading train dataset'
+dataset = pd.DataFrame.from_csv("train_col_filt_2.csv")
+
+print 'reading test dataset'
+dataset_test = pd.DataFrame.from_csv("test_col_filt_2.csv")
+
+good_columns = list(dataset.columns.values)
+
+# check column data type
+data_types = dataset.dtypes
+dummies = []
+dummies_test = []
+print 'starting to convert to dummy variables'
+for i in range(len(good_columns) - 1):
+    # use getdummies in order to convert categorial to workable numerical table
+    col_dif_values = dataset[good_columns[i]].value_counts().shape[0]
+    # maximum number of columns viable to create dummies
+    print good_columns[i], ' has ', col_dif_values, ' columns'
+    if data_types[i] == 'object':
+        if col_dif_values <= 100:
+            print 'working'
+            new_dummy = pd.get_dummies(dataset[good_columns[i]]).astype('float64')
+            new_dummy_test = pd.get_dummies(dataset_test[good_columns[i]]).astype('float64')
+            columns_dummy = new_dummy.columns.values.tolist()
+            for j in range(len(columns_dummy)):
+                columns_dummy[j] = good_columns[i] + '_' + str(columns_dummy[j])
+            new_dummy.columns = columns_dummy
+            # remove categorical column
+            dummies.append(new_dummy)
+            dummies_test.append(new_dummy_test)
+            # add dummy columns
+        else:
+            print dataset[good_columns[i]].value_counts().shape[0]
+            print dataset[good_columns[i]].value_counts().index[:5]
+        dataset = dataset.drop(good_columns[i], 1)
+        dataset_test = dataset_test.drop(good_columns[i], 1)
+dataset = pd.concat(dummies + [dataset], axis=1)
+dataset_test = pd.concat(dummies_test + [dataset_test], axis=1)
+
+columns_dummy = dataset.columns.values.tolist()
+columns_dummy_test = dataset_test.columns.values.tolist()
+
+columns_dummy_and = []
+for col in columns_dummy:
+    if col in columns_dummy_test:
+        columns_dummy_and.append(col)
+dataset = dataset[columns_dummy_and + ['target']]
+dataset_test = dataset_test[columns_dummy_and]
+
+print 'added new ', len(columns_dummy), ' columns'
+
+print 'finished converting dummies'
+
+dataset.to_csv("train_col_dummy.csv")
+dataset_test.to_csv("test_col_dummy.csv")
+
+print 'written dataframe with str to dummy to file'
 
 """
 preprocessing pipe for univariante results

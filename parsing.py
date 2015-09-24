@@ -221,7 +221,7 @@ use only columns over threshhold
 print 'loading univariante results'
 uni_results = pd.read_csv("univar_AUC.csv", index_col=0, names=["index", "AUC"])
 
-uni_thresh = 0.53
+uni_thresh = 0.3
 
 regression_matrix_indices = []
 for i in range(len(uni_results) - 1):

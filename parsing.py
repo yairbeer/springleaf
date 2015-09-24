@@ -195,7 +195,7 @@ univariante evaluation
 #
 # uni_results = np.ones((dataset.shape[1], cv_n))
 # for i in range(X.shape[1]):
-#     if not i % 100:
+#     if not i % 50:
 #         print 'var ', i
 #     for j in range(cv_n):
 #         # train machine learning
@@ -220,7 +220,7 @@ use only columns over threshhold
 print 'loading univariante results'
 uni_results = pd.read_csv("univar_AUC.csv", index_col=0, names=["index", "AUC"])
 
-uni_thresh = 0.55
+uni_thresh = 0.57
 
 regression_matrix_indices = []
 for i in range(len(uni_results) - 1):

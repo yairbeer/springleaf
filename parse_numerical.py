@@ -1,8 +1,8 @@
 __author__ = 'YBeer'
 
 import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
+# import numpy as np
+# import matplotlib.pyplot as plt
 
 dataset = pd.DataFrame.from_csv("train.csv")
 print dataset.head()

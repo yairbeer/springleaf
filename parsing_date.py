@@ -4,8 +4,13 @@ from glob import glob
 from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.metrics import roc_auc_score
 from sklearn.cross_validation import KFold
+from datetime import date
 
 __author__ = 'yaia'
+
+# month dictionary
+dictionary = {'JAN': 1, 'FEB': 2, 'MAR': 3, 'APR': 4, 'MAY': 5, 'JUN': 6, 'JUL': 7, 'AUG': 8, 'SEP': 9, 'OCT': 10,
+              'NOV': 11, 'DEC': 12, }
 
 # get target
 y = pd.Series.from_csv("target.csv")
@@ -19,17 +24,20 @@ for file_name in files:
     X = np.array(X)
 
     # split datetime
-    X_split = np.ones((n, 4)) * (-1)
+    X_split = np.ones((n, 5)) * (-1)
     X_split = X_split.astype('str')
     for i in range(n):
         if str(X[i, 0]) != 'nan':
-            X_split[i, 0] = X[i, 0][:2]
-            X_split[i, 1] = X[i, 0][2:5]
-            X_split[i, 2] = X[i, 0][5:7]
-            X_split[i, 3] = X[i, 0][8:10]
+            cur_datetime = X[i, 0]
+            cur_date = date(2000 + int(cur_datetime[5:7]), dictionary[cur_datetime[2:5]], int(cur_datetime[:2]))
+            X_split[i, 0] = cur_date.year
+            X_split[i, 1] = cur_date.month
+            X_split[i, 2] = cur_date.day
+            X_split[i, 3] = cur_datetime[8:10]
+            X_split[i, 4] = cur_date.weekday()
 
     # convert to DF
-    X_cols = ['day', 'month', 'year', 'hour']
+    X_cols = ['day', 'month', 'year', 'hour', 'weekday']
     X_split = pd.DataFrame(X_split, columns=X_cols)
 
     # get dummy variables

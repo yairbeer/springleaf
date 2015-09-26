@@ -6,7 +6,7 @@ from sklearn.metrics import roc_auc_score
 from sklearn.cross_validation import KFold
 from datetime import date
 
-__author__ = 'yaia'
+__author__ = 'YBeer'
 
 # month dictionary
 dictionary = {'JAN': 1, 'FEB': 2, 'MAR': 3, 'APR': 4, 'MAY': 5, 'JUN': 6, 'JUL': 7, 'AUG': 8, 'SEP': 9, 'OCT': 10,
@@ -16,6 +16,10 @@ dictionary = {'JAN': 1, 'FEB': 2, 'MAR': 3, 'APR': 4, 'MAY': 5, 'JUN': 6, 'JUL':
 y = pd.Series.from_csv("target.csv")
 y = np.array(y)[1:]
 n = y.shape[0]
+
+ml = GradientBoostingClassifier()
+cv_n = 4
+kf = KFold(n, n_folds=cv_n, shuffle=True)
 
 # get columns
 files = glob('VAR_*')
@@ -38,8 +42,11 @@ for file_name in files:
 
     # convert to DF
     X_cols = ['day', 'month', 'year', 'hour', 'weekday']
+    X_split_no_weekday = pd.DataFrame(X_split, columns=X_cols[:-1])
     X_split = pd.DataFrame(X_split, columns=X_cols)
 
+    print file_name
+    print 'with weekday'
     # get dummy variables
     dummies = []
     for col in X_cols:
@@ -51,11 +58,6 @@ for file_name in files:
     X_split = np.array(X_split)
 
     # CV
-    ml = GradientBoostingClassifier(loss='deviance', learning_rate=0.2, n_estimators=150, max_depth=3,
-                                    max_features=None)
-    cv_n = 4
-    kf = KFold(n, n_folds=cv_n, shuffle=True)
-
     auc = []
     for train_index, test_index in kf:
         X_train, X_test = X_split[train_index, :], X_split[test_index, :]
@@ -70,7 +72,35 @@ for file_name in files:
 
         # evaluate
         auc.append(roc_auc_score(y_test, class_pred))
-    print file_name, '\'s auc is: ', np.mean(auc)
+    print 'auc is: ', np.mean(auc)
+
+    print 'without weekday'
+    # get dummy variables
+    dummies = []
+    for col in X_cols:
+        dummies.append(pd.get_dummies(X_split_no_weekday[col]))
+
+    # Concate data and remove duplicates
+    X_split_no_weekday = pd.concat(dummies, axis=1)
+    X_split_no_weekday = X_split_no_weekday.T.drop_duplicates().T
+    X_split_no_weekday = np.array(X_split_no_weekday)
+
+    # CV
+    auc = []
+    for train_index, test_index in kf:
+        X_train, X_test = X_split_no_weekday[train_index, :], X_split_no_weekday[test_index, :]
+        y_train, y_test = y[train_index].ravel(), y[test_index]
+        y_test = y_test.astype('float64')
+
+        # train machine learning
+        ml.fit(X_train, y_train)
+
+        # predict
+        class_pred = ml.predict_proba(X_test)[:, 1]
+
+        # evaluate
+        auc.append(roc_auc_score(y_test, class_pred))
+    print 'auc is: ', np.mean(auc)
 
 # try to use hour as an int
 # add weekdays
@@ -92,3 +122,5 @@ for file_name in files:
 # VAR_0179.csv 's auc is:  0.554406420132
 # VAR_0204.csv 's auc is:  0.522435927466
 # VAR_0217.csv 's auc is:  0.528191615785
+
+# with weekdays

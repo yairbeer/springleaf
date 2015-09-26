@@ -42,7 +42,7 @@ for file_name in files:
 
     # convert to DF
     X_cols = ['day', 'month', 'year', 'hour', 'weekday']
-    X_split_no_weekday = pd.DataFrame(X_split, columns=X_cols[:-1])
+    X_split_no_weekday = pd.DataFrame(X_split[:, :-1], columns=X_cols[:-1])
     X_split = pd.DataFrame(X_split, columns=X_cols)
 
     print file_name
@@ -77,7 +77,7 @@ for file_name in files:
     print 'without weekday'
     # get dummy variables
     dummies = []
-    for col in X_cols:
+    for col in X_cols[:-1]:
         dummies.append(pd.get_dummies(X_split_no_weekday[col]))
 
     # Concate data and remove duplicates
@@ -103,24 +103,84 @@ for file_name in files:
     print 'auc is: ', np.mean(auc)
 
 # try to use hour as an int
-# add weekdays
 
-# without weekdays
-# VAR_0073.csv 's auc is:  0.632563213696
-# VAR_0075.csv 's auc is:  0.586792449527
-# VAR_0156.csv 's auc is:  0.520748159105
-# VAR_0157.csv 's auc is:  0.504222153918
-# VAR_0158.csv 's auc is:  0.503908630126
-# VAR_0159.csv 's auc is:  0.520651153676
-# VAR_0166.csv 's auc is:  0.542473141234
-# VAR_0167.csv 's auc is:  0.511193353482
-# VAR_0168.csv 's auc is:  0.525478066271
-# VAR_0169.csv 's auc is:  0.542489900662
-# VAR_0176.csv 's auc is:  0.554388644498
-# VAR_0177.csv 's auc is:  0.515065511893
-# VAR_0178.csv 's auc is:  0.528280723983
-# VAR_0179.csv 's auc is:  0.554406420132
-# VAR_0204.csv 's auc is:  0.522435927466
-# VAR_0217.csv 's auc is:  0.528191615785
-
-# with weekdays
+# VAR_0073.csv
+# with weekday
+# auc is:  0.633557420088
+# without weekday
+# auc is:  0.63358292588
+# VAR_0075.csv
+# with weekday
+# auc is:  0.591458805652
+# without weekday
+# auc is:  0.586035098418
+# VAR_0156.csv
+# with weekday
+# auc is:  0.521305211597
+# without weekday
+# auc is:  0.521373482187
+# VAR_0157.csv
+# with weekday
+# auc is:  0.505032914601
+# without weekday
+# auc is:  0.505097542485
+# VAR_0158.csv
+# with weekday
+# auc is:  0.505079087979
+# without weekday
+# auc is:  0.50491856685
+# VAR_0159.csv
+# with weekday
+# auc is:  0.521372924308
+# without weekday
+# auc is:  0.521281286924
+# VAR_0166.csv
+# with weekday
+# auc is:  0.543771719974
+# without weekday
+# auc is:  0.543779412115
+# VAR_0167.csv
+# with weekday
+# auc is:  0.512103132896
+# without weekday
+# auc is:  0.512103254272
+# VAR_0168.csv
+# with weekday
+# auc is:  0.526349419516
+# without weekday
+# auc is:  0.526234876782
+# VAR_0169.csv
+# with weekday
+# auc is:  0.543590668204
+# without weekday
+# auc is:  0.543455878569
+# VAR_0176.csv
+# with weekday
+# auc is:  0.555420096579
+# without weekday
+# auc is:  0.555405259103
+# VAR_0177.csv
+# with weekday
+# auc is:  0.516328691247
+# without weekday
+# auc is:  0.51626582353
+# VAR_0178.csv
+# with weekday
+# auc is:  0.529445712606
+# without weekday
+# auc is:  0.529326858156
+# VAR_0179.csv
+# with weekday
+# auc is:  0.5552237813
+# without weekday
+# auc is:  0.555079484566
+# VAR_0204.csv
+# with weekday
+# auc is:  0.523556049364
+# without weekday
+# auc is:  0.523556049364
+# VAR_0217.csv
+# with weekday
+# auc is:  0.532996576706
+# without weekday
+# auc is:  0.524693494842

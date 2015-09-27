@@ -10,7 +10,7 @@ __author__ = 'YBeer'
 
 # month dictionary
 dictionary = {'JAN': 1, 'FEB': 2, 'MAR': 3, 'APR': 4, 'MAY': 5, 'JUN': 6, 'JUL': 7, 'AUG': 8, 'SEP': 9, 'OCT': 10,
-              'NOV': 11, 'DEC': 12, }
+              'NOV': 11, 'DEC': 12}
 
 # get target
 y = pd.Series.from_csv("target.csv")

@@ -110,6 +110,63 @@ dictionary = {'JAN': 1, 'FEB': 2, 'MAR': 3, 'APR': 4, 'MAY': 5, 'JUN': 6, 'JUL':
 data_types = dataset.dtypes
 dummies = []
 dummies_test = []
+
+# add good date channels
+print 'starting to convert date channels'
+
+date_col = ['VAR_0073', 'VAR_0075', 'VAR_0176']
+
+for col in date_col:
+    X = dataset[col]
+    X = np.array(X)
+
+    X_test = dataset_test[col]
+    X_test = np.array(X_test)
+
+    # split datetime
+    X_split = np.ones((n, 5)) * (-1)
+    for i in range(n):
+        if str(X[i]) != 'nan':
+            cur_datetime = X[i]
+            cur_date = date(2000 + int(cur_datetime[5:7]), dictionary[cur_datetime[2:5]], int(cur_datetime[:2]))
+            X_split[i, 0] = cur_date.year
+            X_split[i, 1] = cur_date.month
+            X_split[i, 2] = cur_date.day
+            X_split[i, 3] = cur_datetime[8:10]
+            X_split[i, 4] = cur_date.weekday()
+
+    X_split_test = np.ones((n, 5)) * (-1)
+    for i in range(n):
+        if str(X_test[i]) != 'nan':
+            cur_datetime = X_test[i]
+            cur_date = date(2000 + int(cur_datetime[5:7]), dictionary[cur_datetime[2:5]], int(cur_datetime[:2]))
+            X_split_test[i, 0] = cur_date.year
+            X_split_test[i, 1] = cur_date.month
+            X_split_test[i, 2] = cur_date.day
+            X_split_test[i, 3] = cur_datetime[8:10]
+            X_split_test[i, 4] = cur_date.weekday()
+
+    # convert to DF
+    X_cols = ['day', 'month', 'year', 'hour', 'weekday']
+    X_split = pd.DataFrame(X_split, columns=X_cols)
+    X_split_test = pd.DataFrame(X_split_test, columns=X_cols)
+
+    # get dummy variables
+    new_dummy = pd.get_dummies(X_split).astype('float64')
+    columns_dummy = new_dummy.columns.values.tolist()
+    for j in range(len(columns_dummy)):
+        columns_dummy[j] = col + '_' + str(columns_dummy[j])
+    new_dummy.columns = columns_dummy
+
+    new_dummy_test = pd.get_dummies(X_split_test).astype('float64')
+    columns_dummy_test = new_dummy_test.columns.values.tolist()
+    for j in range(len(columns_dummy)):
+        columns_dummy_test[j] = col + '_' + str(columns_dummy_test[j])
+    new_dummy_test.columns = columns_dummy
+
+    dummies.append(new_dummy)
+    dummies_test.append(new_dummy_test)
+
 print 'starting to convert to dummy variables'
 for i in range(len(good_columns) - 1):
     # use getdummies in order to convert categorial to workable numerical table
@@ -129,7 +186,7 @@ for i in range(len(good_columns) - 1):
             columns_dummy_test = new_dummy_test.columns.values.tolist()
             for j in range(len(columns_dummy)):
                 columns_dummy_test[j] = good_columns[i] + '_' + str(columns_dummy_test[j])
-            new_dummy_test.columns = columns_dummy
+            new_dummy_test.columns = columns_dummy_test
 
             # remove categorical column
             dummies.append(new_dummy)
@@ -143,68 +200,13 @@ for i in range(len(good_columns) - 1):
         dataset = dataset.drop(good_columns[i], 1)
         dataset_test = dataset_test.drop(good_columns[i], 1)
 
-# add good date channels
-date_col = ['VAR_0073', 'VAR_0075', 'VAR_0176']
-for col in date_col:
-    X = dataset[col]
-    X = np.array(X)
-
-    X_test = dataset_test[col]
-    X_test = np.array(X_test)
-
-    # split datetime
-    X_split = np.ones((n, 5)) * (-1)
-    X_split = X_split.astype('str')
-    for i in range(n):
-        if str(X[i, 0]) != 'nan':
-            cur_datetime = X[i, 0]
-            cur_date = date(2000 + int(cur_datetime[5:7]), dictionary[cur_datetime[2:5]], int(cur_datetime[:2]))
-            X_split[i, 0] = cur_date.year
-            X_split[i, 1] = cur_date.month
-            X_split[i, 2] = cur_date.day
-            X_split[i, 3] = cur_datetime[8:10]
-            X_split[i, 4] = cur_date.weekday()
-
-    X_split_test = np.ones((n, 5)) * (-1)
-    X_split_test = X_split_test.astype('str')
-    for i in range(n):
-        if str(X[i, 0]) != 'nan':
-            cur_datetime = X_test[i, 0]
-            cur_date = date(2000 + int(cur_datetime[5:7]), dictionary[cur_datetime[2:5]], int(cur_datetime[:2]))
-            X_split_test[i, 0] = cur_date.year
-            X_split_test[i, 1] = cur_date.month
-            X_split_test[i, 2] = cur_date.day
-            X_split_test[i, 3] = cur_datetime[8:10]
-            X_split_test[i, 4] = cur_date.weekday()
-
-    # convert to DF
-    X_cols = ['day', 'month', 'year', 'hour', 'weekday']
-    X_split = pd.DataFrame(X_split, columns=X_cols)
-    X_split_test = pd.DataFrame(X_split_test, columns=X_cols)
-
-    print 'with weekday'
-    # get dummy variables
-    new_dummy = pd.get_dummies(X_split).astype('float64')
-    columns_dummy = new_dummy.columns.values.tolist()
-    for j in range(len(columns_dummy)):
-        columns_dummy[j] = good_columns[i] + '_' + str(columns_dummy[j])
-    new_dummy.columns = columns_dummy
-
-    new_dummy_test = pd.get_dummies(X_split_test).astype('float64')
-    columns_dummy_test = new_dummy_test.columns.values.tolist()
-    for j in range(len(columns_dummy)):
-        columns_dummy_test[j] = good_columns[i] + '_' + str(columns_dummy_test[j])
-    new_dummy_test.columns = columns_dummy
-
-    dummies.append(new_dummy)
-    dummies_test.append(new_dummy_test)
-
 dataset = pd.concat(dummies + [dataset], axis=1)
 dataset_test = pd.concat(dummies_test + [dataset_test], axis=1)
 
 columns_dummy = dataset.columns.values.tolist()
 columns_dummy_test = dataset_test.columns.values.tolist()
 
+# add only common columns for train and test
 columns_dummy_and = []
 for col in columns_dummy:
     if col in columns_dummy_test:

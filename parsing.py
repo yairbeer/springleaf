@@ -301,7 +301,7 @@ use only columns over threshhold
 print 'loading univariante results'
 uni_results = pd.read_csv("univar_AUC.csv", index_col=0, names=["index", "AUC"])
 
-uni_thresh = 0.61
+uni_thresh = 0.63
 print 'threshold is ', uni_thresh
 regression_matrix_indices = []
 for i in range(len(uni_results) - 1):
@@ -373,7 +373,7 @@ for train_index, test_index in kf:
         # predict
         log_pred[test_index, i] = classifier_full[i].predict_proba(X_test)[:, 1]
 log_reg.fit(log_pred, y.ravel())
-print log_reg.intercept_, log_reg.coef_
+print log_reg.intercept_, log_reg.coef_, roc_auc_score(y, log_reg.predict_proba(X))
 
 """
 Evaluate test file
@@ -403,7 +403,7 @@ for i in range(len(classifier_full)):
     class_self_pred[:, i] = classifier_full[i].predict_proba(X_train)[:, 1]
 
 # fit log
-ensemble_pred = log_reg.predict(class_pred)
+ensemble_pred = log_reg.predict_proba(class_pred)
 
 submission_file = pd.DataFrame.from_csv("sample_submission.csv")
 submission_file['target'] = ensemble_pred
@@ -411,5 +411,3 @@ submission_file.to_csv("rf_dummy_univar_" + str(uni_thresh) + "ensemble.csv")
 
 submission_file['target'] = class_pred[:, 0]
 submission_file.to_csv("rf_dummy_univar_" + str(uni_thresh) + "ensemble_ref.csv")
-
-# [[ -1.32782547   5.00651273  12.79379161]]

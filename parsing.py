@@ -12,6 +12,7 @@ from datetime import date
 
 
 classifier = RandomForestClassifier()
+classifier_dummy = GradientBoostingClassifier()
 classifier_full = GradientBoostingClassifier(loss='deviance', learning_rate=0.2, n_estimators=150, max_depth=3,
                                              max_features=None)
 
@@ -102,6 +103,8 @@ dataset_test = pd.DataFrame.from_csv("test_col_filt_2.csv")
 good_columns = list(dataset.columns.values)
 
 n = dataset.shape[0]
+y = np.array(dataset)[:, -1].ravel()
+y = np.array(y).astype('int')
 
 dictionary = {'JAN': 1, 'FEB': 2, 'MAR': 3, 'APR': 4, 'MAY': 5, 'JUN': 6, 'JUL': 7, 'AUG': 8, 'SEP': 9, 'OCT': 10,
               'NOV': 11, 'DEC': 12}
@@ -177,20 +180,26 @@ for i in range(len(good_columns) - 1):
         if col_dif_values <= 100:
             print 'working'
             new_dummy = pd.get_dummies(dataset[good_columns[i]]).astype('float32')
-            columns_dummy = new_dummy.columns.values.tolist()
-            for j in range(len(columns_dummy)):
-                columns_dummy[j] = good_columns[i] + '_' + str(columns_dummy[j])
-            new_dummy.columns = columns_dummy
+            classifier_dummy.fit(np.array(new_dummy), y)
+            self_predict = classifier_dummy.predict_proba(np.array(new_dummy))[:, 1].ravel()
+            self_predict = np.array(self_predict)
+            roc_auc = roc_auc_score(y, self_predict)
+            print 'auc = ', roc_auc
+            if roc_auc > 0.54:
+                columns_dummy = new_dummy.columns.values.tolist()
+                for j in range(len(columns_dummy)):
+                    columns_dummy[j] = good_columns[i] + '_' + str(columns_dummy[j])
+                new_dummy.columns = columns_dummy
 
-            new_dummy_test = pd.get_dummies(dataset_test[good_columns[i]]).astype('float32')
-            columns_dummy_test = new_dummy_test.columns.values.tolist()
-            for j in range(len(columns_dummy)):
-                columns_dummy_test[j] = good_columns[i] + '_' + str(columns_dummy_test[j])
-            new_dummy_test.columns = columns_dummy_test
+                new_dummy_test = pd.get_dummies(dataset_test[good_columns[i]]).astype('float32')
+                columns_dummy_test = new_dummy_test.columns.values.tolist()
+                for j in range(len(columns_dummy)):
+                    columns_dummy_test[j] = good_columns[i] + '_' + str(columns_dummy_test[j])
+                new_dummy_test.columns = columns_dummy_test
 
-            # remove categorical column
-            dummies.append(new_dummy)
-            dummies_test.append(new_dummy_test)
+                # remove categorical column
+                dummies.append(new_dummy)
+                dummies_test.append(new_dummy_test)
         dataset = dataset.drop(good_columns[i], 1)
         dataset_test = dataset_test.drop(good_columns[i], 1)
 

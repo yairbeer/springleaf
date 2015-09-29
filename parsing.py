@@ -176,13 +176,13 @@ for i in range(len(good_columns) - 1):
     if data_types[i] == 'object':
         if col_dif_values <= 100:
             print 'working'
-            new_dummy = pd.get_dummies(dataset[good_columns[i]]).astype('float64')
+            new_dummy = pd.get_dummies(dataset[good_columns[i]]).astype('float32')
             columns_dummy = new_dummy.columns.values.tolist()
             for j in range(len(columns_dummy)):
                 columns_dummy[j] = good_columns[i] + '_' + str(columns_dummy[j])
             new_dummy.columns = columns_dummy
 
-            new_dummy_test = pd.get_dummies(dataset_test[good_columns[i]]).astype('float64')
+            new_dummy_test = pd.get_dummies(dataset_test[good_columns[i]]).astype('float32')
             columns_dummy_test = new_dummy_test.columns.values.tolist()
             for j in range(len(columns_dummy)):
                 columns_dummy_test[j] = good_columns[i] + '_' + str(columns_dummy_test[j])
@@ -191,12 +191,6 @@ for i in range(len(good_columns) - 1):
             # remove categorical column
             dummies.append(new_dummy)
             dummies_test.append(new_dummy_test)
-            # add dummy columns
-        # else:
-        #     val0 = str(np.array(dataset[good_columns[i]])[0])
-        #     print val0
-        #     if val0[-2:] == '00' or val0 == 'nan':
-        #         dataset[good_columns[i]].to_csv(good_columns[i] + '.csv', header=['date'])
         dataset = dataset.drop(good_columns[i], 1)
         dataset_test = dataset_test.drop(good_columns[i], 1)
 
@@ -220,7 +214,7 @@ print 'finished converting dummies'
 
 dataset.to_csv("train_col_dummy.csv")
 dataset_test.to_csv("test_col_dummy.csv")
-
+del dataset_test, dataset
 print 'written dataframe with str to dummy to file'
 
 """
@@ -229,6 +223,7 @@ preprocessing pipe for univariante results
 # get file with all numerics
 print 'loading dataset with dummies from file'
 dataset = pd.DataFrame.from_csv("train_col_dummy.csv")
+dataset = dataset.astype('float32')
 
 print 'changing to array'
 dataset = np.array(dataset)

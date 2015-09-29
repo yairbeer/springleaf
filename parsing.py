@@ -117,54 +117,54 @@ dummies_test = []
 # add good date channels
 print 'starting to convert date channels'
 
-date_col = ['VAR_0073']
-
-for col in date_col:
-    X = dataset[col]
-    X = np.array(X)
-
-    X_test = dataset_test[col]
-    X_test = np.array(X_test)
-
-    # split datetime
-    X_split = np.ones((n, 3)) * (-1)
-    for i in range(n):
-        if str(X[i]) != 'nan':
-            cur_datetime = X[i]
-            cur_date = date(2000 + int(cur_datetime[5:7]), dictionary[cur_datetime[2:5]], int(cur_datetime[:2]))
-            X_split[i, 0] = cur_date.year
-            X_split[i, 1] = cur_date.month
-            X_split[i, 2] = cur_date.day
-
-    X_split_test = np.ones((n, 3)) * (-1)
-    for i in range(n):
-        if str(X_test[i]) != 'nan':
-            cur_datetime = X_test[i]
-            cur_date = date(2000 + int(cur_datetime[5:7]), dictionary[cur_datetime[2:5]], int(cur_datetime[:2]))
-            X_split_test[i, 0] = cur_date.year
-            X_split_test[i, 1] = cur_date.month
-            X_split_test[i, 2] = cur_date.day
-
-    # convert to DF
-    X_cols = ['day', 'month', 'year', 'hour', 'weekday']
-    X_split = pd.DataFrame(X_split, columns=X_cols)
-    X_split_test = pd.DataFrame(X_split_test, columns=X_cols)
-
-    # get dummy variables
-    new_dummy = pd.get_dummies(X_split).astype('int')
-    columns_dummy = new_dummy.columns.values.tolist()
-    for j in range(len(columns_dummy)):
-        columns_dummy[j] = col + '_' + str(columns_dummy[j])
-    new_dummy.columns = columns_dummy
-
-    new_dummy_test = pd.get_dummies(X_split_test).astype('int')
-    columns_dummy_test = new_dummy_test.columns.values.tolist()
-    for j in range(len(columns_dummy)):
-        columns_dummy_test[j] = col + '_' + str(columns_dummy_test[j])
-    new_dummy_test.columns = columns_dummy
-
-    dummies.append(new_dummy)
-    dummies_test.append(new_dummy_test)
+# date_col = ['VAR_0073']
+#
+# for col in date_col:
+#     X = dataset[col]
+#     X = np.array(X)
+#
+#     X_test = dataset_test[col]
+#     X_test = np.array(X_test)
+#
+#     # split datetime
+#     X_split = np.ones((n, 3)) * (-1)
+#     for i in range(n):
+#         if str(X[i]) != 'nan':
+#             cur_datetime = X[i]
+#             cur_date = date(2000 + int(cur_datetime[5:7]), dictionary[cur_datetime[2:5]], int(cur_datetime[:2]))
+#             X_split[i, 0] = cur_date.year
+#             X_split[i, 1] = cur_date.month
+#             X_split[i, 2] = cur_date.day
+#
+#     X_split_test = np.ones((n, 3)) * (-1)
+#     for i in range(n):
+#         if str(X_test[i]) != 'nan':
+#             cur_datetime = X_test[i]
+#             cur_date = date(2000 + int(cur_datetime[5:7]), dictionary[cur_datetime[2:5]], int(cur_datetime[:2]))
+#             X_split_test[i, 0] = cur_date.year
+#             X_split_test[i, 1] = cur_date.month
+#             X_split_test[i, 2] = cur_date.day
+#
+#     # convert to DF
+#     X_cols = ['day', 'month', 'year']
+#     X_split = pd.DataFrame(X_split, columns=X_cols)
+#     X_split_test = pd.DataFrame(X_split_test, columns=X_cols)
+#
+#     # get dummy variables
+#     new_dummy = pd.get_dummies(X_split).astype('int')
+#     columns_dummy = new_dummy.columns.values.tolist()
+#     for j in range(len(columns_dummy)):
+#         columns_dummy[j] = col + '_' + str(columns_dummy[j])
+#     new_dummy.columns = columns_dummy
+#
+#     new_dummy_test = pd.get_dummies(X_split_test).astype('int')
+#     columns_dummy_test = new_dummy_test.columns.values.tolist()
+#     for j in range(len(columns_dummy)):
+#         columns_dummy_test[j] = col + '_' + str(columns_dummy_test[j])
+#     new_dummy_test.columns = columns_dummy
+#
+#     dummies.append(new_dummy)
+#     dummies_test.append(new_dummy_test)
 
 print 'starting to convert to dummy variables'
 for i in range(len(good_columns) - 1):
@@ -173,7 +173,7 @@ for i in range(len(good_columns) - 1):
     # maximum number of columns viable to create dummies
     print good_columns[i], ' has ', col_dif_values, ' columns'
     if data_types[i] == 'object':
-        if col_dif_values <= 100:
+        if col_dif_values <= 10:
             print 'working'
             new_dummy = pd.get_dummies(dataset[good_columns[i]]).astype('int')
             classifier_dummy.fit(np.array(new_dummy), y)
@@ -245,9 +245,9 @@ imp.fit(X)
 X = imp.transform(X)
 
 # standardizing results
-# print 'standardizing results'
-# scaler = preprocessing.StandardScaler().fit(X)
-# X = scaler.transform(X)
+print 'standardizing results'
+scaler = preprocessing.StandardScaler().fit(X)
+X = scaler.transform(X)
 
 """
 univariante evaluation

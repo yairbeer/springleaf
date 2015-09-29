@@ -117,7 +117,7 @@ dummies_test = []
 # add good date channels
 print 'starting to convert date channels'
 
-date_col = ['VAR_0073', 'VAR_0075']
+date_col = ['VAR_0073']
 
 for col in date_col:
     X = dataset[col]
@@ -127,7 +127,7 @@ for col in date_col:
     X_test = np.array(X_test)
 
     # split datetime
-    X_split = np.ones((n, 5)) * (-1)
+    X_split = np.ones((n, 3)) * (-1)
     for i in range(n):
         if str(X[i]) != 'nan':
             cur_datetime = X[i]
@@ -135,10 +135,8 @@ for col in date_col:
             X_split[i, 0] = cur_date.year
             X_split[i, 1] = cur_date.month
             X_split[i, 2] = cur_date.day
-            X_split[i, 3] = cur_datetime[8:10]
-            X_split[i, 4] = cur_date.weekday()
 
-    X_split_test = np.ones((n, 5)) * (-1)
+    X_split_test = np.ones((n, 3)) * (-1)
     for i in range(n):
         if str(X_test[i]) != 'nan':
             cur_datetime = X_test[i]
@@ -146,8 +144,6 @@ for col in date_col:
             X_split_test[i, 0] = cur_date.year
             X_split_test[i, 1] = cur_date.month
             X_split_test[i, 2] = cur_date.day
-            X_split_test[i, 3] = cur_datetime[8:10]
-            X_split_test[i, 4] = cur_date.weekday()
 
     # convert to DF
     X_cols = ['day', 'month', 'year', 'hour', 'weekday']
@@ -155,13 +151,13 @@ for col in date_col:
     X_split_test = pd.DataFrame(X_split_test, columns=X_cols)
 
     # get dummy variables
-    new_dummy = pd.get_dummies(X_split).astype('float64')
+    new_dummy = pd.get_dummies(X_split).astype('int')
     columns_dummy = new_dummy.columns.values.tolist()
     for j in range(len(columns_dummy)):
         columns_dummy[j] = col + '_' + str(columns_dummy[j])
     new_dummy.columns = columns_dummy
 
-    new_dummy_test = pd.get_dummies(X_split_test).astype('float64')
+    new_dummy_test = pd.get_dummies(X_split_test).astype('int')
     columns_dummy_test = new_dummy_test.columns.values.tolist()
     for j in range(len(columns_dummy)):
         columns_dummy_test[j] = col + '_' + str(columns_dummy_test[j])
@@ -185,7 +181,7 @@ for i in range(len(good_columns) - 1):
             self_predict = np.array(self_predict)
             roc_auc = roc_auc_score(y, self_predict)
             print 'auc = ', roc_auc
-            if roc_auc > 0.58:
+            if roc_auc > 0.55:
                 print 'adding dummy to data'
                 columns_dummy = new_dummy.columns.values.tolist()
                 for j in range(len(columns_dummy)):
@@ -219,7 +215,7 @@ dataset = dataset[columns_dummy_and + ['target']]
 dataset_test = dataset_test[columns_dummy_and]
 
 
-print 'added new ', len(columns_dummy_and), ' columns'
+print 'total of ', len(columns_dummy_and), ' columns'
 
 print 'finished converting dummies'
 
@@ -239,7 +235,8 @@ print 'changing to array'
 dataset = np.array(dataset)
 
 X = dataset[:, :-1]
-y = dataset[:, -1]
+
+y = np.array(dataset)[:, -1]
 
 # impotate
 print 'impotating'
@@ -248,9 +245,9 @@ imp.fit(X)
 X = imp.transform(X)
 
 # standardizing results
-print 'standardizing results'
-scaler = preprocessing.StandardScaler().fit(X)
-X = scaler.transform(X)
+# print 'standardizing results'
+# scaler = preprocessing.StandardScaler().fit(X)
+# X = scaler.transform(X)
 
 """
 univariante evaluation
@@ -278,10 +275,11 @@ for i in range(X.shape[1]):
         print 'var ', i
     for j in range(cv_n):
         # train machine learning
-        classifier.fit(X_train_list[j][:, i].reshape((X_train_list[j].shape[0], 1)), y_train_list[j])
+        x = X_train_list[j][:, i].reshape((X_train_list[j].shape[0], 1))
+        classifier.fit(x, y_train_list[j])
 
         # predict
-        class_pred = classifier.predict_proba(X_test_list[j][:, i].reshape((X_test_list[j].shape[0], 1)))[:, 1]
+        class_pred = classifier.predict_proba(x)[:, 1]
         # evaluate
         uni_results[i, j] = roc_auc_score(y_test_list[j], class_pred)
 

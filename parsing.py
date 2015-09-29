@@ -117,7 +117,7 @@ dummies_test = []
 # add good date channels
 print 'starting to convert date channels'
 
-date_col = ['VAR_0073', 'VAR_0075', 'VAR_0176']
+date_col = ['VAR_0073', 'VAR_0075']
 
 for col in date_col:
     X = dataset[col]

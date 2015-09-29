@@ -360,6 +360,21 @@ for i in range(len(classifier_full)):
         auc.append(roc_auc_score(y_test, class_pred))
     print i, ' auc is: ', np.mean(auc)
 
+# get log regression params
+log_pred = np.ones((X.shape[0], 3))
+for train_index, test_index in kf:
+    X_train, X_test = X[train_index, :], X[test_index, :]
+    y_train, y_test = y[train_index].ravel(), y[test_index].ravel()
+    class_pred = np.ones((X_test.shape[0], 3))
+    for i in range(len(classifier_full)):
+        # train machine learning
+        classifier_full[i].fit(X_train, y_train)
+
+        # predict
+        log_pred[test_index, i] = classifier_full[i].predict_proba(X_test)[:, 1]
+log_reg.fit(log_pred, y.ravel())
+print log_reg.intercept_, log_reg.coef_
+
 """
 Evaluate test file
 """
@@ -381,15 +396,20 @@ X_test = scaler.transform(X_test)
 # X_test = PCA.transform(X_test)
 
 # predict to ensemble
-class_pred = np.ones((X.shape[0], 3))
+class_pred = np.ones((X_test.shape[0], 3))
+class_self_pred = np.ones((X_train.shape[0], 3))
 for i in range(len(classifier_full)):
     class_pred[:, i] = classifier_full[i].predict_proba(X_test)[:, 1]
+    class_self_pred[:, i] = classifier_full[i].predict_proba(X_train)[:, 1]
 
 # fit log
-log_reg.fit(class_pred, y_train)
-print log_reg.coef_
 ensemble_pred = log_reg.predict(class_pred)
 
 submission_file = pd.DataFrame.from_csv("sample_submission.csv")
 submission_file['target'] = ensemble_pred
 submission_file.to_csv("rf_dummy_univar_" + str(uni_thresh) + "ensemble.csv")
+
+submission_file['target'] = class_pred[:, 0]
+submission_file.to_csv("rf_dummy_univar_" + str(uni_thresh) + "ensemble_ref.csv")
+
+# [[ -1.32782547   5.00651273  12.79379161]]

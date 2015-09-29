@@ -365,7 +365,6 @@ log_pred = np.ones((X.shape[0], 3))
 for train_index, test_index in kf:
     X_train, X_test = X[train_index, :], X[test_index, :]
     y_train, y_test = y[train_index].ravel(), y[test_index].ravel()
-    class_pred = np.ones((X_test.shape[0], 3))
     for i in range(len(classifier_full)):
         # train machine learning
         classifier_full[i].fit(X_train, y_train)
@@ -373,7 +372,7 @@ for train_index, test_index in kf:
         # predict
         log_pred[test_index, i] = classifier_full[i].predict_proba(X_test)[:, 1]
 log_reg.fit(log_pred, y.ravel())
-print log_reg.intercept_, log_reg.coef_, roc_auc_score(y, log_reg.predict_proba(X))
+print log_reg.intercept_, log_reg.coef_, roc_auc_score(y.ravel(), log_reg.predict_proba(log_pred))
 
 """
 Evaluate test file

@@ -14,10 +14,10 @@ from sklearn.linear_model import LogisticRegression
 
 classifier = RandomForestClassifier()
 classifier_dummy = GradientBoostingClassifier()
-classifier_full = [GradientBoostingClassifier(loss='deviance', learning_rate=0.2, n_estimators=40, max_depth=3,
+classifier_full = [GradientBoostingClassifier(loss='deviance', learning_rate=0.2, n_estimators=150, max_depth=3,
                                               max_features=None),
-                   RandomForestClassifier(n_estimators=40),
-                   ExtraTreesClassifier(n_estimators=40)]
+                   RandomForestClassifier(n_estimators=150),
+                   ExtraTreesClassifier(n_estimators=150)]
 log_reg = LogisticRegression()
 """
 Remove comlumns with only 1 answer
@@ -301,7 +301,7 @@ use only columns over threshhold
 print 'loading univariante results'
 uni_results = pd.read_csv("univar_AUC.csv", index_col=0, names=["index", "AUC"])
 
-uni_thresh = 0.63
+uni_thresh = 0.3
 print 'threshold is ', uni_thresh
 regression_matrix_indices = []
 for i in range(len(uni_results) - 1):
@@ -361,6 +361,7 @@ for i in range(len(classifier_full)):
     print i, ' auc is: ', np.mean(auc)
 
 # get log regression params
+print 'preparing ensemble coefficients'
 log_pred = np.ones((X.shape[0], 3))
 for train_index, test_index in kf:
     X_train, X_test = X[train_index, :], X[test_index, :]
@@ -372,7 +373,7 @@ for train_index, test_index in kf:
         # predict
         log_pred[test_index, i] = classifier_full[i].predict_proba(X_test)[:, 1]
 log_reg.fit(log_pred, y.ravel())
-print log_reg.intercept_, log_reg.coef_, roc_auc_score(y.ravel(), log_reg.predict_proba(log_pred))
+print log_reg.intercept_, log_reg.coef_, roc_auc_score(y.ravel(), log_reg.predict_proba(log_pred)[:, 1].ravel())
 
 """
 Evaluate test file

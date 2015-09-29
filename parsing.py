@@ -186,6 +186,7 @@ for i in range(len(good_columns) - 1):
             roc_auc = roc_auc_score(y, self_predict)
             print 'auc = ', roc_auc
             if roc_auc > 0.54:
+                print 'adding dummy to data'
                 columns_dummy = new_dummy.columns.values.tolist()
                 for j in range(len(columns_dummy)):
                     columns_dummy[j] = good_columns[i] + '_' + str(columns_dummy[j])

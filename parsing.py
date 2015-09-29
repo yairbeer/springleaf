@@ -179,20 +179,20 @@ for i in range(len(good_columns) - 1):
     if data_types[i] == 'object':
         if col_dif_values <= 100:
             print 'working'
-            new_dummy = pd.get_dummies(dataset[good_columns[i]]).astype('float32')
+            new_dummy = pd.get_dummies(dataset[good_columns[i]]).astype('int')
             classifier_dummy.fit(np.array(new_dummy), y)
             self_predict = classifier_dummy.predict_proba(np.array(new_dummy))[:, 1].ravel()
             self_predict = np.array(self_predict)
             roc_auc = roc_auc_score(y, self_predict)
             print 'auc = ', roc_auc
-            if roc_auc > 0.54:
+            if roc_auc > 0.58:
                 print 'adding dummy to data'
                 columns_dummy = new_dummy.columns.values.tolist()
                 for j in range(len(columns_dummy)):
                     columns_dummy[j] = good_columns[i] + '_' + str(columns_dummy[j])
                 new_dummy.columns = columns_dummy
 
-                new_dummy_test = pd.get_dummies(dataset_test[good_columns[i]]).astype('float32')
+                new_dummy_test = pd.get_dummies(dataset_test[good_columns[i]]).astype('int')
                 columns_dummy_test = new_dummy_test.columns.values.tolist()
                 for j in range(len(columns_dummy)):
                     columns_dummy_test[j] = good_columns[i] + '_' + str(columns_dummy_test[j])
@@ -218,14 +218,15 @@ for col in columns_dummy:
 dataset = dataset[columns_dummy_and + ['target']]
 dataset_test = dataset_test[columns_dummy_and]
 
-print 'added new ', len(columns_dummy), ' columns'
+
+print 'added new ', len(columns_dummy_and), ' columns'
 
 print 'finished converting dummies'
 
 dataset.to_csv("train_col_dummy.csv")
 dataset_test.to_csv("test_col_dummy.csv")
 del dataset_test, dataset
-print 'written dataframe with str to dummy to file'
+print 'written dataframe with converted str to dummy to file'
 
 """
 preprocessing pipe for univariante results
@@ -233,7 +234,6 @@ preprocessing pipe for univariante results
 # get file with all numerics
 print 'loading dataset with dummies from file'
 dataset = pd.DataFrame.from_csv("train_col_dummy.csv")
-dataset = dataset.astype('float32')
 
 print 'changing to array'
 dataset = np.array(dataset)

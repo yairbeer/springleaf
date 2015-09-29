@@ -3,21 +3,22 @@ __author__ = 'YBeer'
 import pandas as pd
 import numpy as np
 from sklearn import preprocessing
-from sklearn.ensemble import GradientBoostingClassifier, RandomForestClassifier
+from sklearn.ensemble import GradientBoostingClassifier, RandomForestClassifier, ExtraTreesClassifier
 from sklearn.cross_validation import KFold
 from sklearn.metrics import roc_auc_score
 from sklearn.preprocessing import Imputer
 from sklearn.decomposition import PCA
 from datetime import date
+from sklearn.linear_model import LogisticRegression
 
 
 classifier = RandomForestClassifier()
 classifier_dummy = GradientBoostingClassifier()
-classifier_full = GradientBoostingClassifier(loss='deviance', learning_rate=0.2, n_estimators=150, max_depth=3,
-                                             max_features=None)
-classifier_full_1 = RandomForestClassifier()
-classifier_full_2 = GradientBoostingClassifier()
-
+classifier_full = [GradientBoostingClassifier(loss='deviance', learning_rate=0.2, n_estimators=40, max_depth=3,
+                                              max_features=None),
+                   RandomForestClassifier(n_estimators=40),
+                   ExtraTreesClassifier(n_estimators=40)]
+log_reg = LogisticRegression()
 """
 Remove comlumns with only 1 answer
 """
@@ -300,8 +301,8 @@ use only columns over threshhold
 print 'loading univariante results'
 uni_results = pd.read_csv("univar_AUC.csv", index_col=0, names=["index", "AUC"])
 
-uni_thresh = 0.3
-
+uni_thresh = 0.61
+print 'threshold is ', uni_thresh
 regression_matrix_indices = []
 for i in range(len(uni_results) - 1):
     if uni_results['AUC'][i] > uni_thresh:
@@ -343,18 +344,21 @@ cv_n = 4
 kf = KFold(dataset.shape[0], n_folds=cv_n, shuffle=True)
 
 print 'start full model evaluation'
-for train_index, test_index in kf:
-    X_train, X_test = X[train_index, :], X[test_index, :]
-    y_train, y_test = y[train_index].ravel(), y[test_index].ravel()
+for i in range(len(classifier_full)):
+    auc = []
+    for train_index, test_index in kf:
+        X_train, X_test = X[train_index, :], X[test_index, :]
+        y_train, y_test = y[train_index].ravel(), y[test_index].ravel()
 
-    # train machine learning
-    classifier_full.fit(X_train, y_train)
+        # train machine learning
+        classifier_full[i].fit(X_train, y_train)
 
-    # predict
-    class_pred = classifier_full.predict_proba(X_test)[:, 1]
+        # predict
+        class_pred = classifier_full[i].predict_proba(X_test)[:, 1]
 
-    # evaluate
-    print 'GBC auc is: ', roc_auc_score(y_test, class_pred)
+        # evaluate
+        auc.append(roc_auc_score(y_test, class_pred))
+    print i, ' auc is: ', np.mean(auc)
 
 """
 Evaluate test file
@@ -363,7 +367,9 @@ print 'fitting full data'
 # fitting full model
 X_train = X
 y_train = y
-classifier_full.fit(X_train, y_train)
+
+for i in range(len(classifier_full)):
+    classifier_full[i].fit(X_train, y_train)
 
 dataset_test = pd.DataFrame.from_csv("test_col_dummy.csv")
 dataset_test = np.array(dataset_test)
@@ -374,9 +380,16 @@ X_test = imp.transform(X_test)
 X_test = scaler.transform(X_test)
 # X_test = PCA.transform(X_test)
 
-# predict
-class_pred = classifier_full.predict_proba(X_test)[:, 1]
+# predict to ensemble
+class_pred = np.ones((X.shape[0], 3))
+for i in range(len(classifier_full)):
+    class_pred[:, i] = classifier_full[i].predict_proba(X_test)[:, 1]
+
+# fit log
+log_reg.fit(class_pred, y_train)
+print log_reg.coef_
+ensemble_pred = log_reg.predict(class_pred)
 
 submission_file = pd.DataFrame.from_csv("sample_submission.csv")
-submission_file['target'] = class_pred
-submission_file.to_csv("rf_dummy_univar_" + str(uni_thresh) + ".csv")
+submission_file['target'] = ensemble_pred
+submission_file.to_csv("rf_dummy_univar_" + str(uni_thresh) + "ensemble.csv")

@@ -1,5 +1,3 @@
-__author__ = 'YBeer'
-
 import pandas as pd
 import numpy as np
 from sklearn import preprocessing
@@ -11,6 +9,7 @@ from sklearn.decomposition import PCA
 from datetime import date
 from sklearn.linear_model import LogisticRegression
 
+__author__ = 'YBeer'
 
 classifier = RandomForestClassifier()
 classifier_dummy = GradientBoostingClassifier()

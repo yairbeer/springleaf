@@ -7,6 +7,7 @@ from sklearn.metrics import roc_auc_score
 from sklearn.preprocessing import Imputer
 from sklearn.decomposition import PCA
 import matplotlib.pyplot as plt
+import random
 
 __author__ = 'YBeer'
 
@@ -19,6 +20,7 @@ uni_results = pd.read_csv("univar_AUC.csv", index_col=0, names=["index", "AUC"])
 # print regression_matrix_indices
 print 'loading dataset'
 dataset = pd.DataFrame.from_csv("train_col_dummy.csv")
+dataset = dataset.sa
 
 print 'changing to array'
 dataset = np.array(dataset)
@@ -60,6 +62,10 @@ for item in item_list:
     """
     split data
     """
+    rows = random.sample(dataset.index, 1000)
+
+    dataset = dataset.ix[rows]
+
     col_1 = 0
     col_2 = 1
     split_true = []

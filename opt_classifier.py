@@ -21,7 +21,7 @@ for i in range(len(uni_results) - 1):
     if uni_results['AUC'][i] > uni_thresh:
         regression_matrix_indices.append(i)
 print len(regression_matrix_indices)
-print regression_matrix_indices
+# print regression_matrix_indices
 
 print 'loading dataset'
 dataset = pd.DataFrame.from_csv("train_col_dummy.csv")
@@ -55,20 +55,23 @@ full model CV
 # CV
 cv_n = 4
 kf = KFold(dataset.shape[0], n_folds=cv_n, shuffle=True)
-
-classifier = RandomForestClassifier()
 print 'start full model evaluation'
-auc = []
-for train_index, test_index in kf:
-    X_train, X_test = X[train_index, :], X[test_index, :]
-    y_train, y_test = y[train_index].ravel(), y[test_index].ravel()
 
-    # train machine learning
-    classifier[i].fit(X_train, y_train)
+item_list = [0.05, 0.1, 0.25, 0.5, 0.75]
+for item in item_list:
+    print item
+    classifier = RandomForestClassifier(max_depth=12, n_estimators=30, max_features=0.25)
+    auc = []
+    for train_index, test_index in kf:
+        X_train, X_test = X[train_index, :], X[test_index, :]
+        y_train, y_test = y[train_index].ravel(), y[test_index].ravel()
 
-    # predict
-    class_pred = classifier[i].predict_proba(X_test)[:, 1]
+        # train machine learning
+        classifier.fit(X_train, y_train)
 
-    # evaluate
-    auc.append(roc_auc_score(y_test, class_pred))
-print i, ' auc is: ', np.mean(auc)
+        # predict
+        class_pred = classifier.predict_proba(X_test)[:, 1]
+
+        # evaluate
+        auc.append(roc_auc_score(y_test, class_pred))
+    print i, ' auc is: ', np.mean(auc)

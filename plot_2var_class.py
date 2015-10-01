@@ -20,6 +20,8 @@ uni_results = pd.read_csv("univar_AUC.csv", index_col=0, names=["index", "AUC"])
 # print regression_matrix_indices
 print 'loading dataset'
 dataset = pd.DataFrame.from_csv("train_col_dummy.csv")
+rows = random.sample(dataset.index, 1000)
+dataset = dataset.ix[rows]
 
 print 'changing to array'
 dataset = np.array(dataset)
@@ -61,10 +63,6 @@ for item in item_list:
     """
     split data
     """
-    rows = random.sample(dataset.index, 1000)
-
-    dataset = dataset.ix[rows]
-
     col_1 = 0
     col_2 = 1
     split_true = []

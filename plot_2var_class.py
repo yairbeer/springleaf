@@ -1,7 +1,6 @@
 import pandas as pd
 import numpy as np
 from sklearn import preprocessing
-from sklearn.linear_model import LogisticRegression
 from sklearn.cross_validation import KFold
 from sklearn.metrics import roc_auc_score
 from sklearn.preprocessing import Imputer
@@ -26,52 +25,46 @@ dataset = dataset.ix[rows]
 print 'changing to array'
 dataset = np.array(dataset)
 
-item_list = [0.62]
-for item in item_list:
+uni_thresh = 0.62
+print 'threshold is ', uni_thresh
+regression_matrix_indices = []
+for i in range(len(uni_results) - 1):
+    if uni_results['AUC'][i] > uni_thresh:
+        regression_matrix_indices.append(i)
+print len(regression_matrix_indices)
 
-    print item
-    classifier = LogisticRegression()
+X = dataset[:, regression_matrix_indices]
+y = dataset[:, -1].ravel()
 
-    uni_thresh = item
-    print 'threshold is ', uni_thresh
-    regression_matrix_indices = []
-    for i in range(len(uni_results) - 1):
-        if uni_results['AUC'][i] > uni_thresh:
-            regression_matrix_indices.append(i)
-    print len(regression_matrix_indices)
+# impotate
+print 'impotating'
+imp = Imputer(missing_values='NaN', strategy='mean', axis=1)
+imp.fit(X)
+X = imp.transform(X)
 
-    X = dataset[:, regression_matrix_indices]
-    y = dataset[:, -1].ravel()
+# standardizing results
+print 'standardizing results'
+scaler = preprocessing.StandardScaler().fit(X)
+X = scaler.transform(X)
 
-    # impotate
-    print 'impotating'
-    imp = Imputer(missing_values='NaN', strategy='mean', axis=1)
-    imp.fit(X)
-    X = imp.transform(X)
+# PCA
+print 'PCA results'
+pca_decomp = PCA(n_components=5)
+X = pca_decomp.fit_transform(X)
+print X.shape
 
-    # standardizing results
-    print 'standardizing results'
-    scaler = preprocessing.StandardScaler().fit(X)
-    X = scaler.transform(X)
-
-    # PCA
-    print 'PCA results'
-    pca_decomp = PCA(n_components=5)
-    X = pca_decomp.fit_transform(X)
-    print X.shape
-
-    """
-    split data
-    """
-    col_1 = 0
-    col_2 = 1
-    split_true = []
-    split_false = []
-    for i in range(X.shape[0]):
-        if y[i]:
-            split_true.append([X[i, col_1], X[i, col_2]])
-        else:
-            split_false.append([X[i, col_1], X[i, col_2]])
+"""
+split data
+"""
+col_1 = 0
+col_2 = 1
+split_true = []
+split_false = []
+for i in range(X.shape[0]):
+    if y[i]:
+        split_true.append([X[i, col_1], X[i, col_2]])
+    else:
+        split_false.append([X[i, col_1], X[i, col_2]])
 split_true = np.array(split_true)
 split_false = np.array(split_false)
 plt.plot(split_true, 'go', split_false, 'ro')

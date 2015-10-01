@@ -13,7 +13,7 @@ __author__ = 'YBeer'
 
 classifier = RandomForestClassifier()
 classifier_dummy = GradientBoostingClassifier()
-classifier_full = [GradientBoostingClassifier(loss='deviance', learning_rate=0.2, n_estimators=150, max_depth=3,
+classifier_full = [GradientBoostingClassifier(loss='deviance', learning_rate=0.2, n_estimators=150, max_depth=5,
                                               max_features=None),
                    RandomForestClassifier(max_depth=12, max_features=0.25, n_estimators=150),
                    LogisticRegression()]

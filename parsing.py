@@ -15,7 +15,8 @@ classifier = RandomForestClassifier()
 classifier_dummy = GradientBoostingClassifier()
 classifier_full = [GradientBoostingClassifier(loss='deviance', learning_rate=0.2, n_estimators=150, max_depth=3,
                                               max_features=None),
-                   RandomForestClassifier(max_depth=12, max_features=0.25, n_estimators=150)]
+                   RandomForestClassifier(max_depth=12, max_features=0.25, n_estimators=150),
+                   LogisticRegression()]
 log_reg = LogisticRegression()
 """
 Remove comlumns with only 1 answer
@@ -360,7 +361,7 @@ for i in range(len(classifier_full)):
 
 # get log regression params
 print 'preparing ensemble coefficients'
-log_pred = np.ones((X.shape[0], 2))
+log_pred = np.ones((X.shape[0], 3))
 for train_index, test_index in kf:
     X_train, X_test = X[train_index, :], X[test_index, :]
     y_train, y_test = y[train_index].ravel(), y[test_index].ravel()
@@ -394,8 +395,8 @@ X_test = scaler.transform(X_test)
 # X_test = PCA.transform(X_test)
 
 # predict to ensemble
-class_pred = np.ones((X_test.shape[0], 2))
-class_self_pred = np.ones((X_train.shape[0], 2))
+class_pred = np.ones((X_test.shape[0], 3))
+class_self_pred = np.ones((X_train.shape[0], 3))
 for i in range(len(classifier_full)):
     class_pred[:, i] = classifier_full[i].predict_proba(X_test)[:, 1]
     class_self_pred[:, i] = classifier_full[i].predict_proba(X_train)[:, 1]

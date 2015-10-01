@@ -19,7 +19,7 @@ uni_results = pd.read_csv("univar_AUC.csv", index_col=0, names=["index", "AUC"])
 # print regression_matrix_indices
 print 'loading dataset'
 dataset = pd.DataFrame.from_csv("train_col_dummy.csv")
-rows = random.sample(dataset.index, 1000)
+rows = random.sample(dataset.index, 10000)
 dataset = dataset.ix[rows]
 
 print 'changing to array'
@@ -67,5 +67,5 @@ for i in range(X.shape[0]):
         split_false.append([X[i, col_1], X[i, col_2]])
 split_true = np.array(split_true)
 split_false = np.array(split_false)
-plt.plot(split_true, 'go', split_false, 'ro')
+plt.plot(split_true[:, 0], split_true[:, 1], 'go', split_false[:, 0], split_false[:, 1], 'ro')
 plt.show()

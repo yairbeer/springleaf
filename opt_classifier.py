@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 from sklearn import preprocessing
-from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.cross_validation import KFold
 from sklearn.metrics import roc_auc_score
 from sklearn.preprocessing import Imputer
@@ -21,13 +21,14 @@ dataset = pd.DataFrame.from_csv("train_col_dummy.csv")
 print 'changing to array'
 dataset = np.array(dataset)
 
-item_list = [0.62, 0.6, 0.58, 0.56, 0.54, 0.52, 0.3]
+item_list = [1, 3, 5, 7, 9]
 for item in item_list:
 
     print item
-    classifier = LogisticRegression()
+    classifier = GradientBoostingClassifier(loss='deviance', learning_rate=0.2, n_estimators=50, max_depth=item,
+                                            max_features=0.25)
 
-    uni_thresh = item
+    uni_thresh = 0.3
     print 'threshold is ', uni_thresh
     regression_matrix_indices = []
     for i in range(len(uni_results) - 1):

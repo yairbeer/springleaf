@@ -56,8 +56,8 @@ print X.shape
 """
 split data
 """
-col_1 = 0
-col_2 = 1
+col_1 = 1
+col_2 = 2
 split_true = []
 split_false = []
 for i in range(X.shape[0]):
@@ -68,5 +68,6 @@ for i in range(X.shape[0]):
 split_true = np.array(split_true)
 split_false = np.array(split_false)
 plt.plot(split_true[:, 0], split_true[:, 1], 'go', split_false[:, 0], split_false[:, 1], 'ro')
+plt.xlim((-20, 20))
 plt.xlim((-20, 20))
 plt.show()

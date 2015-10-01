@@ -20,7 +20,6 @@ uni_results = pd.read_csv("univar_AUC.csv", index_col=0, names=["index", "AUC"])
 # print regression_matrix_indices
 print 'loading dataset'
 dataset = pd.DataFrame.from_csv("train_col_dummy.csv")
-dataset = dataset.sa
 
 print 'changing to array'
 dataset = np.array(dataset)

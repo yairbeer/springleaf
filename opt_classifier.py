@@ -20,17 +20,17 @@ uni_results = pd.read_csv("univar_AUC.csv", index_col=0, names=["index", "AUC"])
 # print regression_matrix_indices
 print 'loading dataset'
 dataset = pd.DataFrame.from_csv("train_col_dummy.csv")
-rows = random.sample(dataset.index, 20000)
-dataset = dataset.ix[rows]
+# rows = random.sample(dataset.index, 50000)
+# dataset = dataset.ix[rows]
 
 print 'changing to array'
 dataset = np.array(dataset)
 
-item_list = range(2, 12, 2)
+item_list = range(40, 110, 10)
 for item in item_list:
 
     print item
-    classifier = KNeighborsClassifier(n_neighbors=item)
+    classifier = KNeighborsClassifier(n_neighbors=90)
 
     uni_thresh = 0.3
     print 'threshold is ', uni_thresh
@@ -56,7 +56,7 @@ for item in item_list:
 
     # PCA
     print 'PCA results'
-    pca_decomp = PCA(n_components=100)
+    pca_decomp = PCA(n_components=20)
     X = pca_decomp.fit_transform(X)
     print X.shape
 
@@ -70,7 +70,6 @@ for item in item_list:
 
     auc = []
     for train_index, test_index in kf:
-        print 'next run'
         X_train, X_test = X[train_index, :], X[test_index, :]
         y_train, y_test = y[train_index].ravel(), y[test_index].ravel()
 

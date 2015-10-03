@@ -26,7 +26,7 @@ for item in item_list:
 
     print item
     classifier = GradientBoostingClassifier(loss='deviance', learning_rate=0.2, n_estimators=50, max_depth=5,
-                                            max_features=item)
+                                            max_features=0.4)
 
     uni_thresh = 0.3
     print 'threshold is ', uni_thresh

@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 from sklearn import preprocessing
-from sklearn.ensemble import GradientBoostingClassifier
+from sklearn.neighbors import KNeighborsClassifier
 from sklearn.cross_validation import KFold
 from sklearn.metrics import roc_auc_score
 from sklearn.preprocessing import Imputer
@@ -21,12 +21,11 @@ dataset = pd.DataFrame.from_csv("train_col_dummy.csv")
 print 'changing to array'
 dataset = np.array(dataset)
 
-item_list = [0.05, 0.1, 0.2, 0.4, 0.8]
+item_list = range(2, 12, 2)
 for item in item_list:
 
     print item
-    classifier = GradientBoostingClassifier(loss='deviance', learning_rate=0.2, n_estimators=50, max_depth=5,
-                                            max_features=0.4)
+    classifier = KNeighborsClassifier(n_neighbors=item)
 
     uni_thresh = 0.3
     print 'threshold is ', uni_thresh
@@ -66,6 +65,7 @@ for item in item_list:
 
     auc = []
     for train_index, test_index in kf:
+        print 'next run'
         X_train, X_test = X[train_index, :], X[test_index, :]
         y_train, y_test = y[train_index].ravel(), y[test_index].ravel()
 

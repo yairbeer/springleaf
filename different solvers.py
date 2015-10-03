@@ -3,13 +3,12 @@ __author__ = 'YBeer'
 import pandas as pd
 import numpy as np
 from sklearn import preprocessing
-from sklearn.linear_model import SGDClassifier
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.neighbors import KNeighborsClassifier
 from sklearn.cross_validation import KFold
 from sklearn.metrics import roc_auc_score
 from sklearn.preprocessing import Imputer
 
-classifier_full = RandomForestClassifier()
+classifier_full = KNeighborsClassifier(n_neighbors=3)
 
 
 
@@ -19,7 +18,7 @@ use only columns over threshhold
 print 'loading univariante results'
 uni_results = pd.read_csv("univar_AUC.csv", index_col=0, names=["index", "AUC"])
 
-uni_thresh = 0.1
+uni_thresh = 0.6
 
 regression_matrix_indices = []
 for i in range(len(uni_results) - 1):

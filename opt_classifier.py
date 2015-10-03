@@ -5,6 +5,9 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.cross_validation import KFold
 from sklearn.metrics import roc_auc_score
 from sklearn.preprocessing import Imputer
+from sklearn.decomposition import PCA
+
+import random
 
 __author__ = 'YBeer'
 
@@ -17,6 +20,8 @@ uni_results = pd.read_csv("univar_AUC.csv", index_col=0, names=["index", "AUC"])
 # print regression_matrix_indices
 print 'loading dataset'
 dataset = pd.DataFrame.from_csv("train_col_dummy.csv")
+rows = random.sample(dataset.index, 20000)
+dataset = dataset.ix[rows]
 
 print 'changing to array'
 dataset = np.array(dataset)
@@ -50,10 +55,10 @@ for item in item_list:
     X = scaler.transform(X)
 
     # PCA
-    # print 'PCA results'
-    # pca_decomp = PCA(n_components=100)
-    # X = pca_decomp.fit_transform(X)
-    # print X.shape
+    print 'PCA results'
+    pca_decomp = PCA(n_components=100)
+    X = pca_decomp.fit_transform(X)
+    print X.shape
 
     """
     full model CV

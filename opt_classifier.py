@@ -2,11 +2,11 @@ import pandas as pd
 import numpy as np
 from sklearn import preprocessing
 from sklearn.neighbors import KNeighborsClassifier
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.cross_validation import KFold
 from sklearn.metrics import roc_auc_score
 from sklearn.preprocessing import Imputer
 from sklearn.decomposition import PCA
-
 import random
 
 __author__ = 'YBeer'
@@ -30,7 +30,8 @@ item_list = range(40, 110, 10)
 for item in item_list:
 
     print item
-    classifier = KNeighborsClassifier(n_neighbors=90)
+    # classifier = KNeighborsClassifier(n_neighbors=90)
+    classifier = RandomForestClassifier(max_depth=12, max_features=0.25, n_estimators=150)
 
     uni_thresh = 0.3
     print 'threshold is ', uni_thresh
@@ -56,8 +57,10 @@ for item in item_list:
 
     # PCA
     print 'PCA results'
-    pca_decomp = PCA(n_components=20)
-    X = pca_decomp.fit_transform(X)
+    pca_decomp = PCA(n_components=10)
+    X_pca = pca_decomp.fit_transform(X)
+
+    X = np.hstack((X, X_pca))
     print X.shape
 
     """

@@ -227,6 +227,7 @@ for i in range(len(good_columns) - 1):
         roc_auc_log = roc_auc_score(y, self_predict)
         print 'log\'s auc = ', roc_auc_log
         if roc_auc_log > roc_auc:
+            print 'switch to log data'
             dataset[good_columns[i]] = log_col
 
 dataset = pd.concat(dummies + [dataset], axis=1)

@@ -209,13 +209,13 @@ for i in range(len(good_columns) - 1):
         print 'numerical, checking if log(n+1) regress better than n'
         log_col = np.array(dataset[good_columns[i]]).reshape((n, 1))
         classifier_log.fit(log_col, y)
-        self_predict = classifier_dummy.predict_proba(log_col)[:, 1].ravel()
+        self_predict = classifier_log.predict_proba(log_col)[:, 1].ravel()
         self_predict = np.array(self_predict)
         roc_auc = roc_auc_score(y, self_predict)
         print 'auc = ', roc_auc
         log_col = vectorized_log(log_col)
         classifier_log.fit(log_col, y)
-        self_predict = classifier_dummy.predict_proba(log_col)[:, 1].ravel()
+        self_predict = classifier_log.predict_proba(log_col)[:, 1].ravel()
         self_predict = np.array(self_predict)
         roc_auc_log = roc_auc_score(y, self_predict)
         print 'log\'s auc = ', roc_auc

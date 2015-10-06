@@ -55,12 +55,12 @@ for item in item_list:
     scaler = preprocessing.StandardScaler().fit(X)
     X = scaler.transform(X)
 
-    # PCA
-    print 'PCA results'
-    pca_decomp = PCA(n_components=10)
-    X_pca = pca_decomp.fit_transform(X)
-
-    X = np.hstack((X, X_pca))
+    # # PCA
+    # print 'PCA results'
+    # pca_decomp = PCA(n_components=10)
+    # X_pca = pca_decomp.fit_transform(X)
+    #
+    # X = np.hstack((X, X_pca))
     print X.shape
 
     """

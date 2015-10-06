@@ -291,13 +291,13 @@ uni_results = np.mean(uni_results, axis=1)
 
 uni_results = pd.Series(uni_results)
 print uni_results.value_counts()
-uni_results.to_csv("univar_AUC.csv")
+uni_results.to_csv("univar_AUC_imp_fix.csv")
 
 """
 use only columns over threshhold
 """
 print 'loading univariante results'
-uni_results = pd.read_csv("univar_AUC.csv", index_col=0, names=["index", "AUC"])
+uni_results = pd.read_csv("univar_AUC_imp_fix.csv", index_col=0, names=["index", "AUC"])
 
 uni_thresh = 0.3
 print 'threshold is ', uni_thresh
@@ -319,7 +319,7 @@ y = dataset[:, -1]
 
 # impotate
 print 'impotating'
-imp = Imputer(missing_values='NaN', strategy='mean', axis=1)
+imp = Imputer(missing_values='NaN', strategy='mean', axis=0)
 imp.fit(X)
 X = imp.transform(X)
 
@@ -405,7 +405,7 @@ ensemble_pred = log_reg.predict_proba(class_pred)
 
 submission_file = pd.DataFrame.from_csv("sample_submission.csv")
 submission_file['target'] = ensemble_pred
-submission_file.to_csv("rf_dummy_univar_" + str(uni_thresh) + "ensemble.csv")
+submission_file.to_csv("rf_dummy_univar_" + str(uni_thresh) + "ensemble_imp_fix.csv")
 
 submission_file['target'] = class_pred[:, 0]
-submission_file.to_csv("rf_dummy_univar_" + str(uni_thresh) + "ensemble_ref.csv")
+submission_file.to_csv("rf_dummy_univar_" + str(uni_thresh) + "ensemble_ref_imp_fix.csv")

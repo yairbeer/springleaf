@@ -170,7 +170,7 @@ dummies_test = []
 #     dummies.append(new_dummy)
 #     dummies_test.append(new_dummy_test)
 
-vectorized_log = np.vectorize(lambda k: np.log10(1 + k))
+vectorized_log = np.vectorize(lambda k: np.log(1 + k))
 
 print 'starting to convert to dummy variables'
 for i in range(len(good_columns) - 1):
@@ -211,7 +211,7 @@ for i in range(len(good_columns) - 1):
 
         # impotate
         print 'impotating'
-        imp = Imputer(missing_values='NaN', strategy='mean', axis=1)
+        imp = Imputer(missing_values='NaN', strategy='mean', axis=0)
         imp.fit(log_col)
         log_col = imp.transform(log_col)
 
@@ -220,9 +220,7 @@ for i in range(len(good_columns) - 1):
         self_predict = np.array(self_predict)
         roc_auc = roc_auc_score(y, self_predict)
         print 'auc = ', roc_auc
-        print log_col
         log_col = vectorized_log(log_col)
-        print log_col
         classifier_log.fit(log_col, y)
         self_predict = classifier_log.predict_proba(log_col)[:, 1].ravel()
         self_predict = np.array(self_predict)
@@ -271,7 +269,7 @@ y = np.array(dataset)[:, -1]
 
 # impotate
 print 'impotating'
-imp = Imputer(missing_values='NaN', strategy='mean', axis=1)
+imp = Imputer(missing_values='NaN', strategy='mean', axis=0)
 imp.fit(X)
 X = imp.transform(X)
 

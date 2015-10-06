@@ -225,7 +225,7 @@ for i in range(len(good_columns) - 1):
         self_predict = classifier_log.predict_proba(log_col)[:, 1].ravel()
         self_predict = np.array(self_predict)
         roc_auc_log = roc_auc_score(y, self_predict)
-        print 'log\'s auc = ', roc_auc
+        print 'log\'s auc = ', roc_auc_log
         if roc_auc_log > roc_auc:
             dataset[good_columns[i]] = log_col
 

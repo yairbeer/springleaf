@@ -114,7 +114,6 @@ dictionary = {'JAN': 1, 'FEB': 2, 'MAR': 3, 'APR': 4, 'MAY': 5, 'JUN': 6, 'JUL':
 
 # check column data type
 data_types = dataset.dtypes
-print data_types
 dummies = []
 dummies_test = []
 
@@ -210,7 +209,6 @@ for i in range(len(good_columns) - 1):
         log_col = np.array(dataset[good_columns[i]]).reshape((n, 1))
 
         # impotate
-        print 'impotating'
         imp = Imputer(missing_values='NaN', strategy='mean', axis=0)
         imp.fit(log_col)
         log_col = imp.transform(log_col)

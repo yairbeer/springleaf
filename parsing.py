@@ -228,70 +228,70 @@ change categorical variables to dummy variables, meanwhile ignoring variables wi
 """
 preprocessing pipe for univariante results
 """
-# get file with all numerics
-print 'loading dataset with dummies from file'
-dataset = pd.DataFrame.from_csv("train_col_dummy.csv")
-
-print 'changing to array'
-dataset = np.array(dataset)
-
-X = dataset[:, :-1]
-
-y = np.array(dataset)[:, -1]
-
-# impotate
-print 'impotating'
-imp = Imputer(missing_values='NaN', strategy='mean', axis=0)
-imp.fit(X)
-X = imp.transform(X)
-
-# standardizing results
-print 'standardizing results'
-scaler = preprocessing.StandardScaler().fit(X)
-X = scaler.transform(X)
-
-"""
-univariante evaluation
-"""
-# CV
-cv_n = 4
-kf = KFold(dataset.shape[0], n_folds=cv_n, shuffle=True)
-
-print 'start univariante evaluation'
-X_train_list = []
-X_test_list = []
-y_train_list = []
-y_test_list = []
-for train_index, test_index in kf:
-    X_train, X_test = X[train_index, :], X[test_index, :]
-    y_train, y_test = y[train_index].ravel(), y[test_index].ravel()
-    X_train_list.append(X_train)
-    X_test_list.append(X_test)
-    y_train_list.append(y_train)
-    y_test_list.append(y_test)
-
-uni_results = np.ones((dataset.shape[1], cv_n))
-for i in range(X.shape[1]):
-    if not i % 50:
-        print 'var ', i
-    for j in range(cv_n):
-        # train machine learning
-        x = X_train_list[j][:, i].reshape((X_train_list[j].shape[0], 1))
-        classifier.fit(x, y_train_list[j])
-
-        x_test = X_test_list[j][:, i].reshape((X_test_list[j].shape[0], 1))
-        # predict
-        class_pred = classifier.predict_proba(x_test)[:, 1]
-        # evaluate
-        uni_results[i, j] = roc_auc_score(y_test_list[j], class_pred)
-
-print uni_results
-print np.mean(uni_results, axis=1)
-uni_results = np.mean(uni_results, axis=1)
-
-uni_results = pd.Series(uni_results)
-print uni_results.value_counts()
-uni_results.to_csv("univar_AUC_imp_fix.csv")
+# # get file with all numerics
+# print 'loading dataset with dummies from file'
+# dataset = pd.DataFrame.from_csv("train_col_dummy.csv")
+#
+# print 'changing to array'
+# dataset = np.array(dataset)
+#
+# X = dataset[:, :-1]
+#
+# y = np.array(dataset)[:, -1]
+#
+# # impotate
+# print 'impotating'
+# imp = Imputer(missing_values='NaN', strategy='mean', axis=0)
+# imp.fit(X)
+# X = imp.transform(X)
+#
+# # standardizing results
+# print 'standardizing results'
+# scaler = preprocessing.StandardScaler().fit(X)
+# X = scaler.transform(X)
+#
+# """
+# univariante evaluation
+# """
+# # CV
+# cv_n = 4
+# kf = KFold(dataset.shape[0], n_folds=cv_n, shuffle=True)
+#
+# print 'start univariante evaluation'
+# X_train_list = []
+# X_test_list = []
+# y_train_list = []
+# y_test_list = []
+# for train_index, test_index in kf:
+#     X_train, X_test = X[train_index, :], X[test_index, :]
+#     y_train, y_test = y[train_index].ravel(), y[test_index].ravel()
+#     X_train_list.append(X_train)
+#     X_test_list.append(X_test)
+#     y_train_list.append(y_train)
+#     y_test_list.append(y_test)
+#
+# uni_results = np.ones((dataset.shape[1], cv_n))
+# for i in range(X.shape[1]):
+#     if not i % 50:
+#         print 'var ', i
+#     for j in range(cv_n):
+#         # train machine learning
+#         x = X_train_list[j][:, i].reshape((X_train_list[j].shape[0], 1))
+#         classifier.fit(x, y_train_list[j])
+#
+#         x_test = X_test_list[j][:, i].reshape((X_test_list[j].shape[0], 1))
+#         # predict
+#         class_pred = classifier.predict_proba(x_test)[:, 1]
+#         # evaluate
+#         uni_results[i, j] = roc_auc_score(y_test_list[j], class_pred)
+#
+# print uni_results
+# print np.mean(uni_results, axis=1)
+# uni_results = np.mean(uni_results, axis=1)
+#
+# uni_results = pd.Series(uni_results)
+# print uni_results.value_counts()
+# uni_results.to_csv("univar_AUC_imp_fix.csv")
 
 """
 use only columns over threshhold

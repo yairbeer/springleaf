@@ -208,12 +208,21 @@ for i in range(len(good_columns) - 1):
     if data_types[i] == 'int64' or data_types[i] == 'float64':
         print 'numerical, checking if log(n+1) regress better than n'
         log_col = np.array(dataset[good_columns[i]]).reshape((n, 1))
+
+        # impotate
+        print 'impotating'
+        imp = Imputer(missing_values='NaN', strategy='mean', axis=1)
+        imp.fit(log_col)
+        log_col = imp.transform(log_col)
+
         classifier_log.fit(log_col, y)
         self_predict = classifier_log.predict_proba(log_col)[:, 1].ravel()
         self_predict = np.array(self_predict)
         roc_auc = roc_auc_score(y, self_predict)
         print 'auc = ', roc_auc
+        print log_col
         log_col = vectorized_log(log_col)
+        print log_col
         classifier_log.fit(log_col, y)
         self_predict = classifier_log.predict_proba(log_col)[:, 1].ravel()
         self_predict = np.array(self_predict)

@@ -24,11 +24,11 @@ dataset = pd.DataFrame.from_csv("train_col_dummy.csv")
 print 'changing to array'
 dataset = np.array(dataset)
 
-item_list = range(100, 210, 20)
+item_list = range(200, 410, 20)
 for item in item_list:
 
     print item
-    classifier = SGDClassifier(loss='log', penalty='elasticnet', l1_ratio=0.6, n_iter=item)
+    classifier = SGDClassifier(loss='log', penalty='elasticnet', l1_ratio=0.6, n_iter=30)
 
     uni_thresh = 0.3
     print 'threshold is ', uni_thresh

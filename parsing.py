@@ -17,7 +17,7 @@ classifier_dummy = GradientBoostingClassifier()
 classifier_full = [GradientBoostingClassifier(loss='deviance', learning_rate=0.2, n_estimators=150, max_depth=5,
                                               max_features=0.4),
                    RandomForestClassifier(max_depth=12, max_features=0.25, n_estimators=150),
-                   SGDClassifier(loss='log', penalty='elasticnet', l1_ratio=0.6, n_iter=150)]
+                   SGDClassifier(loss='log', penalty='elasticnet', l1_ratio=0.6, n_iter=400)]
 log_reg = LogisticRegression()
 """
 Remove comlumns with only 1 answer

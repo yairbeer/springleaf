@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 from sklearn import preprocessing
 from sklearn.ensemble import GradientBoostingClassifier, RandomForestClassifier
-from sklearn.linear_model import LogisticRegression
+from sklearn.linear_model import SGDClassifier
 from sklearn.cross_validation import KFold
 from sklearn.metrics import roc_auc_score
 from sklearn.preprocessing import Imputer
@@ -13,7 +13,7 @@ from sklearn.linear_model import LogisticRegression
 __author__ = 'YBeer'
 
 classifier = LogisticRegression()
-classifier_log = LogisticRegression()
+classifier_log = SGDClassifier(n_iter=50)
 classifier_dummy = GradientBoostingClassifier()
 classifier_full = [GradientBoostingClassifier(loss='deviance', learning_rate=0.2, n_estimators=150, max_depth=5,
                                               max_features=0.4),

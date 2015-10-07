@@ -1,12 +1,10 @@
 import pandas as pd
 import numpy as np
 from sklearn import preprocessing
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.linear_model import SGDClassifier
 from sklearn.cross_validation import KFold
 from sklearn.metrics import roc_auc_score
 from sklearn.preprocessing import Imputer
-from sklearn.decomposition import PCA
 import random
 
 __author__ = 'YBeer'
@@ -20,18 +18,17 @@ uni_results = pd.read_csv("univar_AUC.csv", index_col=0, names=["index", "AUC"])
 # print regression_matrix_indices
 print 'loading dataset'
 dataset = pd.DataFrame.from_csv("train_col_dummy.csv")
-# rows = random.sample(dataset.index, 50000)
+# rows = random.sample(dataset.index, 30000)
 # dataset = dataset.ix[rows]
 
 print 'changing to array'
 dataset = np.array(dataset)
 
-item_list = range(40, 110, 10)
+item_list = range(100, 210, 20)
 for item in item_list:
 
     print item
-    # classifier = KNeighborsClassifier(n_neighbors=90)
-    classifier = RandomForestClassifier(max_depth=12, max_features=0.25, n_estimators=150)
+    classifier = SGDClassifier(loss='log', penalty='elasticnet', l1_ratio=0.6, n_iter=item)
 
     uni_thresh = 0.3
     print 'threshold is ', uni_thresh
@@ -46,7 +43,7 @@ for item in item_list:
 
     # impotate
     print 'impotating'
-    imp = Imputer(missing_values='NaN', strategy='mean', axis=1)
+    imp = Imputer(missing_values='NaN', strategy='mean', axis=0)
     imp.fit(X)
     X = imp.transform(X)
 

@@ -14,9 +14,9 @@ __author__ = 'YBeer'
 
 classifier = RandomForestClassifier()
 classifier_dummy = GradientBoostingClassifier()
-classifier_full = [GradientBoostingClassifier(loss='deviance', learning_rate=0.2, n_estimators=150, max_depth=5,
+classifier_full = [GradientBoostingClassifier(loss='deviance', learning_rate=0.2, n_estimators=250, max_depth=5,
                                               max_features=0.4),
-                   RandomForestClassifier(max_depth=12, max_features=0.25, n_estimators=150),
+                   RandomForestClassifier(max_depth=12, max_features=0.25, n_estimators=250),
                    SGDClassifier(loss='log', penalty='elasticnet', l1_ratio=0.6, n_iter=400)]
 log_reg = LogisticRegression()
 """

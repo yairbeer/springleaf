@@ -13,7 +13,7 @@ from sklearn.linear_model import LogisticRegression
 __author__ = 'YBeer'
 
 classifier = LogisticRegression()
-classifier_log = SGDClassifier(n_iter=50)
+classifier_log = SGDClassifier(loss='log', penalty='elasticnet', l1_ratio=0.6, n_iter=50)
 classifier_dummy = GradientBoostingClassifier()
 classifier_full = [GradientBoostingClassifier(loss='deviance', learning_rate=0.2, n_estimators=150, max_depth=5,
                                               max_features=0.4),
